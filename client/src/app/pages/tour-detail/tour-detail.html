@@ -1,1 +1,23 @@
-<p>tour-detail works!</p>
+
+<section class="detail-page">
+  <a routerLink="/" class="back-link">← Вернуться к турам</a>
+
+  @if (tour(); as item) {
+    <div class="detail-card">
+      <img [src]="getImageUrl(item.imagePath)" [alt]="item.name" />
+
+      <div class="detail-content">
+        <span class="country">🌍 {{ item.countryName }}</span>
+        <h1>{{ item.name }}</h1>
+
+        <p>📅 Начало: {{ item.startDate | date:'dd.MM.yyyy' }}</p>
+        <p>📅 Окончание: {{ item.endDate | date:'dd.MM.yyyy' }}</p>
+        <p>👥 Свободных мест: {{ item.availablePlaces }}</p>
+
+        <div class="price">{{ item.price }} $</div>
+      </div>
+    </div>
+  } @else {
+    <p>Загружаем информацию о туре...</p>
+  }
+</section>

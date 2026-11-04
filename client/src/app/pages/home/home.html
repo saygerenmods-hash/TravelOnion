@@ -1,4 +1,5 @@
 
+
 <section class="hero">
   <div class="hero-content">
     <span class="hero-label">✈️ Путешествуй вместе с TravelOnion</span>
@@ -25,6 +26,43 @@
       <p>Выбери путешествие, которое подходит именно тебе.</p>
     </div>
   </div>
+  
+<div class="filters">
+  <select #country (change)="setCountry(country.value)">
+    <option value="">Все страны</option>
+    <option value="1">Турция</option>
+    <option value="2">Франция</option>
+    <option value="3">Япония</option>
+    <option value="4">Италия</option>
+    <option value="5">Испания</option>
+  </select>
+
+  <input
+    #price
+    type="number"
+    min="1"
+    placeholder="Максимальная цена ($)"
+    (input)="setMaxPrice(price.value)"
+  />
+
+  <select #sort (change)="setSort(sort.value)">
+    <option value="date">По дате</option>
+    <option value="price">По цене</option>
+  </select>
+
+  <label class="month-filter">
+    <input
+      #month
+      type="checkbox"
+      (change)="setCurrentMonth(month.checked)"
+    />
+    В этом месяце
+  </label>
+</div>
+  
+
+
+
 
   @if (toursResource.isLoading()) {
     <p class="status-message">⏳ Загружаем путешествия...</p>
@@ -67,5 +105,26 @@
         </article>
       }
     </div>
+          
+    
+    <div class="pagination">
+      <button
+        [disabled]="filters().page <= 1"
+        (click)="changePage(filters().page - 1)">
+        ← Назад
+      </button>
+
+      <span>
+        Страница {{ filters().page }}
+        из {{ Math.max(1, Math.ceil((toursResource.value()?.total ?? 0) / filters().pageSize)) }}
+      </span>
+
+      <button
+        [disabled]="filters().page * filters().pageSize >= (toursResource.value()?.total ?? 0)"
+        (click)="changePage(filters().page + 1)">
+        Далее →
+      </button>
+    </div>
   }
 </section>
+
