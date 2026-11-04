@@ -15,13 +15,13 @@ public static class AuthEndpoints
         var group = app.MapGroup("/api/auth")
             .WithTags("Auth");
 
+        // РЕГИСТРАЦИЯ
         group.MapPost("/register", async (
             RegisterDto dto,
             AppDbContext db,
             IValidator<RegisterDto> validator,
             IPasswordHasher<User> passwordHasher) =>
         {
-            // 1. Проверяем введённые данные
             var validation = await validator.ValidateAsync(dto);
 
             if (!validation.IsValid)
@@ -36,7 +36,6 @@ public static class AuthEndpoints
                 return Results.ValidationProblem(errors);
             }
 
-            // 2. Проверяем уникальность имени и email
             var username = dto.Username.Trim();
             var email = dto.Email.Trim().ToLowerInvariant();
 
@@ -58,7 +57,6 @@ public static class AuthEndpoints
                     });
             }
 
-            // 3. Создаём пользователя
             var user = new User
             {
                 Username = username,
@@ -66,15 +64,12 @@ public static class AuthEndpoints
                 CreatedAt = DateTime.UtcNow
             };
 
-            // 4. Безопасно хешируем пароль
             user.PasswordHash = passwordHasher.HashPassword(
                 user, dto.Password);
 
-            // 5. Сохраняем в SQLite
             db.Users.Add(user);
             await db.SaveChangesAsync();
 
-            // 6. Возвращаем данные без пароля
             var result = new UserDto(
                 user.Id,
                 user.Username,
@@ -83,6 +78,50 @@ public static class AuthEndpoints
 
             return Results.Created(
                 $"/api/users/{user.Id}", result);
+        });
+
+        // ВХОД
+        group.MapPost("/login", async (
+            LoginDto dto,
+            AppDbContext db,
+            IPasswordHasher<User> passwordHasher,
+            JwtService jwtService) =>
+        {
+            if (string.IsNullOrWhiteSpace(dto.Email) ||
+                string.IsNullOrWhiteSpace(dto.Password))
+            {
+                return Results.ValidationProblem(
+                    new Dictionary<string, string[]>
+                    {
+                        ["Login"] = ["Введите email и пароль"]
+                    });
+            }
+
+            var email = dto.Email.Trim().ToLowerInvariant();
+
+            var user = await db.Users
+                .FirstOrDefaultAsync(u => u.Email == email);
+
+            if (user is null)
+            {
+                return Results.Unauthorized();
+            }
+
+            var passwordResult =
+                passwordHasher.VerifyHashedPassword(
+                    user,
+                    user.PasswordHash,
+                    dto.Password
+                );
+
+            if (passwordResult == PasswordVerificationResult.Failed)
+            {
+                return Results.Unauthorized();
+            }
+
+            var response = jwtService.GenerateToken(user);
+
+            return Results.Ok(response);
         });
     }
 }
