@@ -1,0 +1,71 @@
+
+<section class="hero">
+  <div class="hero-content">
+    <span class="hero-label">✈️ Путешествуй вместе с TravelOnion</span>
+
+    <h1>Открой для себя <span>новый мир</span></h1>
+
+    <p>
+      Находи лучшие путешествия, исследуй новые страны
+      и планируй незабываемые приключения.
+    </p>
+
+    <a href="#tours" class="hero-button">
+      Смотреть путешествия →
+    </a>
+  </div>
+</section>
+
+
+<section class="tours-section" id="tours">
+  <div class="section-heading">
+    <div>
+      <span class="eyebrow">НАШИ ПРЕДЛОЖЕНИЯ</span>
+      <h2>Популярные путешествия</h2>
+      <p>Выбери путешествие, которое подходит именно тебе.</p>
+    </div>
+  </div>
+
+  @if (toursResource.isLoading()) {
+    <p class="status-message">⏳ Загружаем путешествия...</p>
+  } @else if (toursResource.error()) {
+    <p class="status-message">
+      ❌ Не удалось загрузить туры. Проверь, запущен ли сервер API.
+    </p>
+  } @else if (toursResource.value()?.items?.length === 0) {
+    <p class="status-message">Пока нет доступных путешествий.</p>
+  } @else {
+    <div class="tour-grid">
+      @for (tour of toursResource.value()?.items ?? []; track tour.id) {
+        <article class="tour-card">
+          <img
+            [src]="getImageUrl(tour.imagePath, tour.countryId)"
+            [alt]="tour.name"
+          />
+
+          <div class="tour-info">
+            <span class="country">🌍 {{ tour.countryName }}</span>
+
+            <h3>{{ tour.name }}</h3>
+
+            <p>
+              {{ tour.startDate | date:'dd.MM.yyyy' }}
+              —
+              {{ tour.endDate | date:'dd.MM.yyyy' }}
+            </p>
+
+            <p>Свободных мест: {{ tour.availablePlaces }}</p>
+
+            <div class="tour-bottom">
+              <strong>{{ tour.price }} $</strong>
+
+              <a [routerLink]="['/tours', tour.id]">
+                Подробнее →
+              </a>
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>

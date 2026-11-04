@@ -1,0 +1,160 @@
+
+.hero {
+  min-height: 430px;
+  display: flex;
+  align-items: center;
+  padding: 70px 24px;
+  background:
+    linear-gradient(90deg, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.35)),
+    url('https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1800')
+    center / cover;
+  color: white;
+}
+
+.hero-content {
+  max-width: 1200px;
+  width: 100%;
+  margin: auto;
+}
+
+.hero-label {
+  color: #bfdbfe;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.hero h1 {
+  max-width: 650px;
+  font-size: clamp(36px, 5vw, 58px);
+  line-height: 1.15;
+  margin: 20px 0;
+}
+
+.hero h1 span {
+  color: #60a5fa;
+}
+
+.hero p {
+  max-width: 530px;
+  color: #e2e8f0;
+  line-height: 1.8;
+  margin-bottom: 32px;
+}
+
+.hero-button {
+  display: inline-block;
+  padding: 15px 24px;
+  background: #2563eb;
+  border-radius: 10px;
+  font-weight: 600;
+  color: white;
+}
+
+.hero-button:hover {
+  background: #1d4ed8;
+}
+
+.tours-section {
+  max-width: 1200px;
+  margin: auto;
+  padding: 70px 24px;
+}
+
+.eyebrow {
+  font-size: 12px;
+  font-weight: 800;
+  color: #2563eb;
+  letter-spacing: 2px;
+}
+
+.section-heading h2 {
+  font-size: 32px;
+  margin: 12px 0;
+}
+
+.section-heading p {
+  color: #64748b;
+}
+
+.tour-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  margin-top: 35px;
+}
+
+.tour-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 6px 25px rgba(15, 23, 42, 0.07);
+  transition: transform 0.2s;
+}
+
+.tour-card:hover {
+  transform: translateY(-5px);
+}
+
+.tour-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+}
+
+.tour-info {
+  padding: 22px;
+}
+
+.country {
+  font-size: 13px;
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.tour-info h3 {
+  font-size: 19px;
+  margin: 12px 0;
+}
+
+.tour-info p {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #64748b;
+  min-height: 48px;
+}
+
+.tour-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid #edf0f5;
+  padding-top: 18px;
+  margin-top: 20px;
+}
+
+.tour-bottom strong {
+  font-size: 23px;
+  color: #172033;
+}
+
+.tour-bottom a {
+  color: #2563eb;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+@media (max-width: 850px) {
+  .tour-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 550px) {
+  .tour-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tours-section {
+    padding: 45px 18px;
+  }
+}

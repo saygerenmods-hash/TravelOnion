@@ -1,0 +1,35 @@
+
+<header class="header">
+  <nav class="navbar">
+    <a routerLink="/" class="logo">
+      🌍 Travel<span>Onion</span>
+    </a>
+
+    <div class="nav-links">
+      <a routerLink="/" routerLinkActive="active"
+         [routerLinkActiveOptions]="{ exact: true }">
+        Главная
+      </a>
+
+      <a routerLink="/tours/create" routerLinkActive="active">
+        Создать тур
+      </a>
+
+      <a routerLink="/login" routerLinkActive="active">
+        Войти
+      </a>
+
+      <a routerLink="/register" class="register-btn">
+        Регистрация
+      </a>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <router-outlet />
+</main>
+
+<footer class="footer">
+  <p>© 2026 TravelOnion. Открой мир путешествий!</p>
+</footer>
