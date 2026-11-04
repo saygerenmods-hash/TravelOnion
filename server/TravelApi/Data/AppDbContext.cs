@@ -14,12 +14,39 @@ public class AppDbContext : DbContext
     // Таблицы базы данных
     public DbSet<Tour> Tours => Set<Tour>();
     public DbSet<Country> Countries => Set<Country>();
+    public DbSet<User> Users => Set<User>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        // Связь: одна страна — много туров
+        // Уникальное имя пользователя и email
+modelBuilder.Entity<User>()
+    .HasIndex(u => u.Username)
+    .IsUnique();
+
+modelBuilder.Entity<User>()
+    .HasIndex(u => u.Email)
+    .IsUnique();
+    modelBuilder.Entity<User>().HasData(
+    new User
+    {
+        Id = 1,
+        Username = "demo",
+        Email = "demo@travelonion.local",
+        PasswordHash = "NOT_CONFIGURED",
+        CreatedAt = new DateTime(2026, 11, 1, 0, 0, 0, DateTimeKind.Utc)
+    }
+);
+
+// Связь: один пользователь может создать много туров
+modelBuilder.Entity<Tour>()
+    .HasOne(t => t.Author)
+    .WithMany(u => u.Tours)
+    .HasForeignKey(t => t.AuthorId)
+    .OnDelete(DeleteBehavior.Restrict);
+    
+        // Связь: одна страна может иметь много туров
         modelBuilder.Entity<Tour>()
             .HasOne(t => t.Country)
             .WithMany(c => c.Tours)

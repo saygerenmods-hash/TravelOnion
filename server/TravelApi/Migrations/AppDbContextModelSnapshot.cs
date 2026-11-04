@@ -92,6 +92,8 @@ namespace TravelApi.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AuthorId");
+
                     b.HasIndex("CountryId");
 
                     b.ToTable("Tours");
@@ -154,18 +156,73 @@ namespace TravelApi.Migrations
                         });
                 });
 
+            modelBuilder.Entity("TravelApi.Models.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("Username")
+                        .IsUnique();
+
+                    b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2026, 11, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "demo@travelonion.local",
+                            PasswordHash = "NOT_CONFIGURED",
+                            Username = "demo"
+                        });
+                });
+
             modelBuilder.Entity("TravelApi.Models.Tour", b =>
                 {
+                    b.HasOne("TravelApi.Models.User", "Author")
+                        .WithMany("Tours")
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("TravelApi.Models.Country", "Country")
                         .WithMany("Tours")
                         .HasForeignKey("CountryId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.Navigation("Author");
+
                     b.Navigation("Country");
                 });
 
             modelBuilder.Entity("TravelApi.Models.Country", b =>
+                {
+                    b.Navigation("Tours");
+                });
+
+            modelBuilder.Entity("TravelApi.Models.User", b =>
                 {
                     b.Navigation("Tours");
                 });

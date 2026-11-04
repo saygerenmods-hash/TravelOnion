@@ -1,4 +1,6 @@
 
+using Microsoft.AspNetCore.Identity;
+using TravelApi.Models;
 using FluentValidation;
 using TravelApi.DTOs;
 using TravelApi.Validators;
@@ -19,8 +21,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 // Регистрируем валидаторы
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<IValidator<CreateTourDto>, CreateTourValidator>();
 builder.Services.AddScoped<IValidator<UpdateTourDto>, UpdateTourValidator>();
+builder.Services.AddScoped<IValidator<RegisterDto>, RegisterValidator>();
 
 // Поддержка ответов ProblemDetails
 builder.Services.AddProblemDetails();
@@ -42,5 +46,6 @@ app.MapGet("/", () =>
 });
 
 app.MapTourEndpoints();
+app.MapAuthEndpoints();
 
 app.Run();

@@ -25,4 +25,6 @@ public class Tour
 
     // ID автора (для будущей авторизации)
     public int AuthorId { get; set; }
+    // Пользователь, создавший тур
+public User? Author { get; set; }
 }
