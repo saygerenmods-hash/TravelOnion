@@ -1,4 +1,5 @@
 
+using System.Security.Claims;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using TravelApi.Data;
@@ -122,7 +123,8 @@ if (currentMonth)
 group.MapPost("/", async (
     CreateTourDto dto,
     AppDbContext db,
-    IValidator<CreateTourDto> validator) =>
+    IValidator<CreateTourDto> validator,
+    ClaimsPrincipal user) =>
 {
     var validationResult = await validator.ValidateAsync(dto);
 
@@ -174,7 +176,8 @@ group.MapPost("/", async (
         Price = dto.Price,
         AvailablePlaces = dto.AvailablePlaces,
         CountryId = dto.CountryId,
-        AuthorId = 1
+        AuthorId = int.Parse(
+    user.FindFirstValue(ClaimTypes.NameIdentifier)!)
     };
 
     db.Tours.Add(tour);
@@ -196,22 +199,33 @@ group.MapPost("/", async (
         ))
         .FirstAsync();
 
+   
     return Results.Created($"/api/tours/{tour.Id}", result);
-});
+})
+.RequireAuthorization();
+
+
+        // PUT: Изменить существующий тур
 
 
         // PUT: Изменить существующий тур
         group.MapPut("/{id:int}", async (
-            int id,
-            UpdateTourDto dto,
-            AppDbContext db,
-            IValidator<UpdateTourDto> validator) =>
+    int id,
+    UpdateTourDto dto,
+    AppDbContext db,
+    IValidator<UpdateTourDto> validator,
+    ClaimsPrincipal user) =>
         {
             // Ищем тур по ID
             var tour = await db.Tours.FindAsync(id);
 
             if (tour is null)
                 return Results.NotFound("Тур не найден.");
+                var userId = int.Parse(
+    user.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+    if (tour.AuthorId != userId)
+    return Results.Forbid();
 
             // Проверяем данные через FluentValidation
             var validationResult = await validator.ValidateAsync(dto);
@@ -270,26 +284,34 @@ group.MapPost("/", async (
                 ))
                 .FirstAsync();
 
-            return Results.Ok(result);
-        });
+           return Results.Ok(result);
+})
+.RequireAuthorization();
 
 
 // DELETE: Удалить тур
 group.MapDelete("/{id:int}", async (
     int id,
-    AppDbContext db) =>
+    AppDbContext db,
+    ClaimsPrincipal user) =>
 {
     var tour = await db.Tours.FindAsync(id);
 
     if (tour is null)
         return Results.NotFound("Тур не найден.");
+        var userId = int.Parse(
+    user.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+if (tour.AuthorId != userId)
+    return Results.Forbid();
 
     db.Tours.Remove(tour);
 
     await db.SaveChangesAsync();
 
     return Results.NoContent();
-});
+})
+.RequireAuthorization();
 
 
 
