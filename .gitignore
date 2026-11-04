@@ -1,0 +1,24 @@
+# .NET
+**/bin/
+**/obj/
+.vs/
+
+# SQLite
+*.db
+*.db-shm
+*.db-wal
+
+# Angular / Node.js
+**/node_modules/
+**/dist/
+**/.angular/
+
+# IDE
+.vscode/
+.idea/
+
+# Secrets
+**/appsettings.Local.json
+**/appsettings.*.local.json
+.env
+.env.*
