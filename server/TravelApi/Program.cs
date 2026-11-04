@@ -96,10 +96,13 @@ app.MapGet("/", () =>
     });
 });
 
+app.UseStaticFiles();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapTourEndpoints();
+app.MapTourImageEndpoints();
 app.MapAuthEndpoints();
 
 app.Run();
