@@ -71,19 +71,22 @@ if (currentMonth)
     // Получаем только нужную страницу
     var tours = await query
         .Skip((page - 1) * pageSize)
-        .Take(pageSize)
-        .Select(t => new TourDto(
-            t.Id,
-            t.Name,
-            t.StartDate,
-            t.EndDate,
-            t.Price,
-            t.AvailablePlaces,
-            t.CountryId,
-            t.Country!.Name,
-            t.ImagePath
-        ))
-        .ToListAsync();
+   
+.Take(pageSize)
+.Select(t => new TourDto(
+    t.Id,
+    t.Name,
+    t.StartDate,
+    t.EndDate,
+    t.Price,
+    t.AvailablePlaces,
+    t.CountryId,
+    t.Country!.Name,
+    t.ImagePath,
+    t.AuthorId
+))
+.ToListAsync();
+
 
     return Results.Ok(new
     {
@@ -109,7 +112,8 @@ if (currentMonth)
                     t.AvailablePlaces,
                     t.CountryId,
                     t.Country!.Name,
-                    t.ImagePath
+                    t.ImagePath,
+                    t.AuthorId
                 ))
                 .FirstOrDefaultAsync();
 
@@ -195,7 +199,8 @@ group.MapPost("/", async (
             t.AvailablePlaces,
             t.CountryId,
             t.Country!.Name,
-            t.ImagePath
+            t.ImagePath,
+            t.AuthorId
         ))
         .FirstAsync();
 
@@ -280,7 +285,8 @@ group.MapPost("/", async (
                     t.AvailablePlaces,
                     t.CountryId,
                     t.Country!.Name,
-                    t.ImagePath
+                    t.ImagePath,
+                    t.AuthorId
                 ))
                 .FirstAsync();
 

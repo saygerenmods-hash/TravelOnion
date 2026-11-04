@@ -6,22 +6,35 @@
     </a>
 
     <div class="nav-links">
-      <a routerLink="/" routerLinkActive="active"
-         [routerLinkActiveOptions]="{ exact: true }">
+      <a
+        routerLink="/"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
         Главная
       </a>
 
-      <a routerLink="/tours/create" routerLinkActive="active">
-        Создать тур
-      </a>
+      @if (auth.isLoggedIn()) {
+        <a routerLink="/tours/create" routerLinkActive="active">
+          Создать тур
+        </a>
 
-      <a routerLink="/login" routerLinkActive="active">
-        Войти
-      </a>
+        <span class="username">
+          👤 {{ auth.currentUser()?.username }}
+        </span>
 
-      <a routerLink="/register" class="register-btn">
-        Регистрация
-      </a>
+        <button class="logout-btn" (click)="logout()">
+          Выйти
+        </button>
+      } @else {
+        <a routerLink="/login" routerLinkActive="active">
+          Войти
+        </a>
+
+        <a routerLink="/register" class="register-btn">
+          Регистрация
+        </a>
+      }
     </div>
   </nav>
 </header>

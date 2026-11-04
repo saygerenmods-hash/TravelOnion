@@ -10,5 +10,6 @@ public record TourDto(
     int AvailablePlaces,
     int CountryId,
     string CountryName,
-    string? ImagePath
+    string? ImagePath,
+    int AuthorId
 );

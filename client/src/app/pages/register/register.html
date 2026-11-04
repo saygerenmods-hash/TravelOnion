@@ -1,1 +1,52 @@
-<p>register works!</p>
+
+<section class="auth-page">
+  <form class="auth-card" (ngSubmit)="submit()">
+    <h1>Создать аккаунт</h1>
+    <p>Присоединяйся к TravelOnion!</p>
+
+    <label for="username">Имя пользователя</label>
+    <input
+      id="username"
+      name="username"
+      [(ngModel)]="username"
+      required
+      minlength="3"
+      maxlength="30"
+      placeholder="Например, traveler123"
+    />
+
+    <label for="email">Email</label>
+    <input
+      id="email"
+      type="email"
+      name="email"
+      [(ngModel)]="email"
+      required
+      placeholder="example@gmail.com"
+    />
+
+    <label for="password">Пароль</label>
+    <input
+      id="password"
+      type="password"
+      name="password"
+      [(ngModel)]="password"
+      required
+      minlength="8"
+      placeholder="Минимум 8 символов"
+    />
+
+    @if (error()) {
+      <div class="error-message">{{ error() }}</div>
+    }
+
+    <button type="submit" [disabled]="loading()">
+      {{ loading() ? 'Регистрация...' : 'Зарегистрироваться' }}
+    </button>
+
+    <p class="auth-bottom">
+      Уже есть аккаунт?
+      <a routerLink="/login">Войти</a>
+    </p>
+  </form>
+</section>

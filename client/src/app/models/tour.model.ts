@@ -9,6 +9,7 @@ export interface Tour {
   countryId: number;
   countryName: string;
   imagePath: string | null;
+  authorId: number;
 }
 
 export interface TourListResponse {

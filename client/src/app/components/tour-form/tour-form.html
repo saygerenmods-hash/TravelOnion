@@ -1,0 +1,36 @@
+
+<form class="tour-form" (ngSubmit)="submit()">
+  <h1>{{ title() }}</h1>
+
+  <label>Название путешествия</label>
+  <input name="name" [(ngModel)]="name" required maxlength="150" />
+
+  <label>Страна</label>
+  <select name="countryId" [(ngModel)]="countryId">
+    <option [ngValue]="1">Турция</option>
+    <option [ngValue]="2">Франция</option>
+    <option [ngValue]="3">Япония</option>
+    <option [ngValue]="4">Италия</option>
+    <option [ngValue]="5">Испания</option>
+  </select>
+
+  <label>Дата начала</label>
+  <input type="date" name="startDate" [(ngModel)]="startDate" required />
+
+  <label>Дата окончания</label>
+  <input type="date" name="endDate" [(ngModel)]="endDate" required />
+
+  <label>Цена ($)</label>
+  <input type="number" name="price" [(ngModel)]="price" min="1" required />
+
+  <label>Количество свободных мест</label>
+  <input type="number" name="availablePlaces" [(ngModel)]="availablePlaces" min="1" required />
+
+  @if (error() || serverError()) {
+    <p class="error">{{ error() || serverError() }}</p>
+  }
+
+  <button type="submit" [disabled]="saving()">
+    {{ saving() ? 'Сохраняем...' : 'Сохранить тур' }}
+  </button>
+</form>

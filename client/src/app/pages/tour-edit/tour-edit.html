@@ -1,1 +1,13 @@
-<p>tour-edit works!</p>
+@if (initialData()) {
+  <app-tour-form
+    title="Редактировать путешествие"
+    [initialData]="initialData()"
+    [saving]="saving()"
+    [serverError]="error()"
+    (submitted)="save($event)"
+  />
+} @else {
+  <p style="text-align:center; padding:40px">
+    {{ error() || 'Загружаем тур...' }}
+  </p>
+}

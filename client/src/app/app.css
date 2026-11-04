@@ -78,3 +78,25 @@ main {
     gap: 14px;
   }
 }
+
+.username {
+  color: #2563eb;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.logout-btn {
+  background: #fee2e2;
+  color: #dc2626;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 9px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.logout-btn:hover {
+  background: #fecaca;
+}
+

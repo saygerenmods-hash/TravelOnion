@@ -15,6 +15,44 @@
         <p>👥 Свободных мест: {{ item.availablePlaces }}</p>
 
         <div class="price">{{ item.price }} $</div>
+        
+@if (isAuthor(item.authorId)) {
+  <div class="tour-actions">
+    <a [routerLink]="['/tours', item.id, 'edit']">
+      ✏️ Редактировать
+    </a>
+
+    <button
+      [disabled]="deleting()"
+      (click)="deleteTour(item.id)"
+    >
+      🗑️ Удалить
+
+    </button>
+  </div>
+  
+<div class="image-upload">
+  <label for="tourImage">📷 Фотография путешествия</label>
+
+  <input
+    id="tourImage"
+    type="file"
+    accept="image/jpeg,image/png,image/webp"
+    [disabled]="uploading()"
+    (change)="uploadImage($event, item.id)"
+  />
+
+  @if (uploading()) {
+    <p>⏳ Загружаем фотографию...</p>
+  }
+
+  @if (uploadMessage()) {
+    <p>{{ uploadMessage() }}</p>
+  }
+</div>
+
+}
+
       </div>
     </div>
   } @else {

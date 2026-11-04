@@ -1,1 +1,40 @@
-<p>login works!</p>
+
+<section class="auth-page">
+  <form class="auth-card" (ngSubmit)="submit()">
+    <h1>Вход в TravelOnion</h1>
+    <p>Войди, чтобы создавать свои путешествия.</p>
+
+    <label for="email">Email</label>
+    <input
+      id="email"
+      type="email"
+      name="email"
+      [(ngModel)]="email"
+      required
+      placeholder="example@gmail.com"
+    />
+
+    <label for="password">Пароль</label>
+    <input
+      id="password"
+      type="password"
+      name="password"
+      [(ngModel)]="password"
+      required
+      placeholder="Введи пароль"
+    />
+
+    @if (error()) {
+      <div class="error-message">{{ error() }}</div>
+    }
+
+    <button type="submit" [disabled]="loading()">
+      {{ loading() ? 'Выполняется вход...' : 'Войти' }}
+    </button>
+
+    <p class="auth-bottom">
+      Нет аккаунта?
+      <a routerLink="/register">Зарегистрироваться</a>
+    </p>
+  </form>
+</section>

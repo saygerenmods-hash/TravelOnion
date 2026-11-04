@@ -1,1 +1,6 @@
-<p>tour-create works!</p>
+<app-tour-form
+  title="Создать путешествие"
+  [saving]="saving()"
+  [serverError]="error()"
+  (submitted)="save($event)"
+/>
