@@ -14,26 +14,84 @@ public static class TourEndpoints
             .WithTags("Tours");
 
         // GET: Получить список всех туров
-        group.MapGet("/", async (AppDbContext db) =>
-        {
-            var tours = await db.Tours
-                .Select(t => new TourDto(
-                    t.Id,
-                    t.Name,
-                    t.StartDate,
-                    t.EndDate,
-                    t.Price,
-                    t.AvailablePlaces,
-                    t.CountryId,
-                    t.Country!.Name,
-                    t.ImagePath
-                ))
-                .ToListAsync();
+        
+group.MapGet("/", async (
+    AppDbContext db,
+    int? countryId,
+    decimal? maxPrice,
+    bool currentMonth = false,
+    int page = 1,
+    int pageSize = 5,
+    string sortBy = "date") =>
+{
+    // Начинаем со всех туров
+    var query = db.Tours.AsQueryable();
 
-            return Results.Ok(tours);
-        });
+    // Фильтр по стране
+    if (countryId.HasValue)
+    {
+        query = query.Where(t => t.CountryId == countryId.Value);
+    }
 
-        // GET: Получить тур по ID
+    // Фильтр по максимальной цене
+    if (maxPrice.HasValue)
+    {
+        query = query.Where(t => t.Price <= maxPrice.Value);
+    }
+
+    // Считаем количество подходящих туров
+    // Фильтр по текущему месяцу
+if (currentMonth)
+{
+    var now = DateTime.Today;
+
+    var startOfMonth = new DateTime(now.Year, now.Month, 1);
+    var startOfNextMonth = startOfMonth.AddMonths(1);
+
+    query = query.Where(t =>
+        t.StartDate >= startOfMonth &&
+        t.StartDate < startOfNextMonth);
+}
+    var total = await query.CountAsync();
+
+    // Сортировка
+    query = sortBy.ToLower() switch
+    {
+        "price" => query.OrderBy(t => t.Price),
+        "date" => query.OrderBy(t => t.StartDate),
+        _ => query.OrderBy(t => t.Id)
+    };
+
+    // Ограничиваем размер страницы
+    page = Math.Max(1, page);
+    pageSize = Math.Clamp(pageSize, 1, 50);
+
+    // Получаем только нужную страницу
+    var tours = await query
+        .Skip((page - 1) * pageSize)
+        .Take(pageSize)
+        .Select(t => new TourDto(
+            t.Id,
+            t.Name,
+            t.StartDate,
+            t.EndDate,
+            t.Price,
+            t.AvailablePlaces,
+            t.CountryId,
+            t.Country!.Name,
+            t.ImagePath
+        ))
+        .ToListAsync();
+
+    return Results.Ok(new
+    {
+        page,
+        pageSize,
+        total,
+        items = tours
+    });
+});
+
         group.MapGet("/{id:int}", async (
             int id,
             AppDbContext db) =>
