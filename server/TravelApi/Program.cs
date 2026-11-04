@@ -1,4 +1,7 @@
 
+using FluentValidation;
+using TravelApi.DTOs;
+using TravelApi.Validators;
 using Microsoft.EntityFrameworkCore;
 using TravelApi.Data;
 using TravelApi.Services;
@@ -15,6 +18,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+// Регистрируем валидаторы
+builder.Services.AddScoped<IValidator<CreateTourDto>, CreateTourValidator>();
+builder.Services.AddScoped<IValidator<UpdateTourDto>, UpdateTourValidator>();
+
+// Поддержка ответов ProblemDetails
+builder.Services.AddProblemDetails();
 
 var app = builder.Build();
 
@@ -31,6 +40,7 @@ app.MapGet("/", () =>
         message = "TravelOnion API is running!"
     });
 });
+
 app.MapTourEndpoints();
 
 app.Run();

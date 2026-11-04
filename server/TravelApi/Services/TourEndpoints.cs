@@ -1,4 +1,5 @@
 
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using TravelApi.Data;
 using TravelApi.DTOs;
@@ -120,9 +121,24 @@ if (currentMonth)
 // POST: Создать новый тур
 group.MapPost("/", async (
     CreateTourDto dto,
-    AppDbContext db) =>
+    AppDbContext db,
+    IValidator<CreateTourDto> validator) =>
 {
-    // Проверяем название
+    var validationResult = await validator.ValidateAsync(dto);
+
+    if (!validationResult.IsValid)
+    {
+        var errors = validationResult.Errors
+            .GroupBy(e => e.PropertyName)
+            .ToDictionary(
+                g => g.Key,
+                g => g.Select(e => e.ErrorMessage).ToArray()
+            );
+
+        return Results.ValidationProblem(errors);
+    }
+
+   
     if (string.IsNullOrWhiteSpace(dto.Name))
         return Results.BadRequest("Название тура обязательно.");
 
@@ -183,66 +199,80 @@ group.MapPost("/", async (
     return Results.Created($"/api/tours/{tour.Id}", result);
 });
 
-// PUT: Изменить существующий тур
-group.MapPut("/{id:int}", async (
-    int id,
-    UpdateTourDto dto,
-    AppDbContext db) =>
-{
-    var tour = await db.Tours.FindAsync(id);
 
-    if (tour is null)
-        return Results.NotFound("Тур не найден.");
+        // PUT: Изменить существующий тур
+        group.MapPut("/{id:int}", async (
+            int id,
+            UpdateTourDto dto,
+            AppDbContext db,
+            IValidator<UpdateTourDto> validator) =>
+        {
+            // Ищем тур по ID
+            var tour = await db.Tours.FindAsync(id);
 
-    if (string.IsNullOrWhiteSpace(dto.Name))
-        return Results.BadRequest("Название тура обязательно.");
+            if (tour is null)
+                return Results.NotFound("Тур не найден.");
 
-    if (dto.Price <= 0)
-        return Results.BadRequest("Цена должна быть больше нуля.");
+            // Проверяем данные через FluentValidation
+            var validationResult = await validator.ValidateAsync(dto);
 
-    if (dto.AvailablePlaces <= 0)
-        return Results.BadRequest("Количество мест должно быть больше нуля.");
+            if (!validationResult.IsValid)
+            {
+                var errors = validationResult.Errors
+                    .GroupBy(e => e.PropertyName)
+                    .ToDictionary(
+                        g => g.Key,
+                        g => g.Select(e => e.ErrorMessage).ToArray()
+                    );
 
-    if (dto.StartDate.Date >= dto.EndDate.Date)
-        return Results.BadRequest("Дата окончания должна быть позже даты начала.");
+                return Results.ValidationProblem(errors);
+            }
 
-    // Правило: тур не длиннее 30 дней
-    if ((dto.EndDate.Date - dto.StartDate.Date).TotalDays > 30)
-        return Results.BadRequest("Продолжительность тура не может превышать 30 дней.");
+            // Проверяем существование страны
+            var countryExists = await db.Countries
+                .AnyAsync(c => c.Id == dto.CountryId);
 
-    var countryExists = await db.Countries
-        .AnyAsync(c => c.Id == dto.CountryId);
+            if (!countryExists)
+            {
+                return Results.ValidationProblem(
+                    new Dictionary<string, string[]>
+                    {
+                        ["CountryId"] = new[]
+                        {
+                            "Указанная страна не существует."
+                        }
+                    });
+            }
 
-    if (!countryExists)
-        return Results.BadRequest("Указанная страна не существует.");
+            // Обновляем данные тура
+            tour.Name = dto.Name;
+            tour.StartDate = dto.StartDate;
+            tour.EndDate = dto.EndDate;
+            tour.Price = dto.Price;
+            tour.AvailablePlaces = dto.AvailablePlaces;
+            tour.CountryId = dto.CountryId;
 
-    // Обновляем данные
-    tour.Name = dto.Name;
-    tour.StartDate = dto.StartDate;
-    tour.EndDate = dto.EndDate;
-    tour.Price = dto.Price;
-    tour.AvailablePlaces = dto.AvailablePlaces;
-    tour.CountryId = dto.CountryId;
+            await db.SaveChangesAsync();
 
-    await db.SaveChangesAsync();
+            // Возвращаем обновлённый тур
+            var result = await db.Tours
+                .Where(t => t.Id == id)
+                .Select(t => new TourDto(
+                    t.Id,
+                    t.Name,
+                    t.StartDate,
+                    t.EndDate,
+                    t.Price,
+                    t.AvailablePlaces,
+                    t.CountryId,
+                    t.Country!.Name,
+                    t.ImagePath
+                ))
+                .FirstAsync();
 
-    var result = await db.Tours
-        .Where(t => t.Id == id)
-        .Select(t => new TourDto(
-            t.Id,
-            t.Name,
-            t.StartDate,
-            t.EndDate,
-            t.Price,
-            t.AvailablePlaces,
-            t.CountryId,
-            t.Country!.Name,
-            t.ImagePath
-        ))
-        .FirstAsync();
+            return Results.Ok(result);
+        });
 
-    return Results.Ok(result);
-});
 
 // DELETE: Удалить тур
 group.MapDelete("/{id:int}", async (
